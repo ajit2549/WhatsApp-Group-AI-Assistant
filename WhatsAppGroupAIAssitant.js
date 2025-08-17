@@ -3,6 +3,7 @@ const { Client, LocalAuth } = pkg;
 import qrcode from "qrcode-terminal";
 import axios from "axios";
 import Database from "better-sqlite3";
+import 'dotenv/config';
 
 // ------------------- Setup WhatsApp client -------------------
 const client = new Client({ authStrategy: new LocalAuth() });
@@ -33,7 +34,7 @@ function loadConversation(groupId) {
 }
 
 // ------------------- Your Friendli token -------------------
-const FRIENDLI_TOKEN = "${FRIENDLI_TOKEN}";
+const FRIENDLI_TOKEN = process.env.FRIENDLI_TOKEN;;
 
 client.on("message", (message) => {
     console.log("--------------------------------------------------");
@@ -104,3 +105,4 @@ client.on("message", async (message) => {
 
 // ------------------- Start WhatsApp client -------------------
 client.initialize();
+
