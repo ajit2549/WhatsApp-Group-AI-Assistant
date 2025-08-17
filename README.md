@@ -1,4 +1,3 @@
-[whatsapp_group_bot_readme.md](https://github.com/user-attachments/files/21823658/whatsapp_group_bot_readme.md)
 # WhatsApp Group Bot with Friendli AI
 
 A WhatsApp group bot using `whatsapp-web.js` that replies to messages **only when tagged**, with **persistent conversation memory** stored in SQLite and **AI-powered responses via Friendli**.
