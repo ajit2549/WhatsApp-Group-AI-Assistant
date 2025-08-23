@@ -1,7 +1,7 @@
 // bot.js
 import pkg from "whatsapp-web.js";
 const { Client, LocalAuth } = pkg;
-import qrcode from "qrcode";
+import * as QRCode from "qrcode";   // ✅ fixed import
 import fetch from "node-fetch";
 import Tesseract from "tesseract.js";
 import express from "express";
@@ -32,11 +32,13 @@ const client = new Client({
 });
 
 // ------------------- QR handling -------------------
-client.on("qr", (qr) => {
-  qrcode.toDataURL(qr, (err, url) => {
-    qrImage = url;
+client.on("qr", async (qr) => {
+  try {
+    qrImage = await QRCode.toDataURL(qr);  // ✅ async/await usage
     console.log("📱 QR Code generated. Visit /qr on your Render app to scan.");
-  });
+  } catch (err) {
+    console.error("❌ Error generating QR:", err);
+  }
 });
 
 app.get("/qr", (req, res) => {
