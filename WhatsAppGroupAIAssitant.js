@@ -19,7 +19,21 @@ const client = new Client({
   }
 });
 
-client.on("qr", (qr) => qrcode.generate(qr, { small: true }));
+client.on("qr", (qr) => {
+  qrcode.toDataURL(qr, (err, url) => {
+    qrImage = url;
+    console.log("QR Code generated. Open /qr in your browser.");
+  });
+});
+
+app.get("/qr", (req, res) => {
+  if (qrImage) {
+    res.send(`<img src="${qrImage}" />`);
+  } else {
+    res.send("QR not generated yet. Please wait...");
+  }
+});
+
 client.on("ready", async () => {
   console.log("✅ Bot is ready!");
   console.log("🤖 Bot ID:", client.info.wid._serialized);
@@ -162,3 +176,5 @@ client.on("message", async (msg) => {
 });
 
 client.initialize();
+const PORT = process.env.PORT || 3000;
+app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
