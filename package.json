@@ -2,13 +2,13 @@
   "name": "whatsapp-webhook",
   "version": "1.0.0",
   "description": "",
-  "main": "index.js",
+  "main": "WhatsAppGroupAIAssitant.js",
   "type": "module",
   "scripts": {
-    "start": "node index.js"
+    "start": "node WhatsAppGroupAIAssitant.js"
   },
-  "keywords": [],
-  "author": "",
+  "keywords": ["whatsapp", "bot", "ai"],
+  "author": "Ajit",
   "license": "ISC",
   "dependencies": {
     "@huggingface/inference": "^4.7.1",
