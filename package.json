@@ -11,12 +11,16 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
+    "@huggingface/inference": "^4.7.1",
     "axios": "^1.11.0",
     "better-sqlite3": "^12.2.0",
     "body-parser": "^2.2.0",
     "express": "^5.1.0",
+    "node-fetch": "^3.3.2",
+    "node-telegram-bot-api": "^0.66.0",
     "openai": "^5.12.2",
     "sqlite3": "^5.1.7",
+    "tesseract.js": "^6.0.1",
     "whatsapp-web.js": "^1.32.0"
   }
 }
