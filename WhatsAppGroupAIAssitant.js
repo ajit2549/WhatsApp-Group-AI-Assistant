@@ -14,7 +14,7 @@ const client = new Client({
   authStrategy: new LocalAuth(),
   puppeteer: {
     headless: true,
-    args: ["--no-sandbox", "--disable-setuid-sandbox"]
+    executablePath: '/usr/bin/chromium' // 👈 required in Docker
   }
 });
 
