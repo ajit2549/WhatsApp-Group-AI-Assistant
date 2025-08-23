@@ -4,10 +4,14 @@ const { Client, LocalAuth } = pkg;
 import qrcode from "qrcode-terminal";
 import fetch from "node-fetch";
 import Tesseract from "tesseract.js";
+import express from "express";
 
 const OPENROUTER_API_KEY = process.env.OPENROUTER_API_KEY;
 const PROMO_FORWARD_GROUP_ID = process.env.FORWARD_TO_GROUP;
 const TARGET_GROUP_ID = process.env.TARGET_GROUP;
+
+const app = express();
+let qrImage = null;
 
 // ------------------- Setup WhatsApp client -------------------
 const client = new Client({
@@ -22,7 +26,7 @@ const client = new Client({
 client.on("qr", (qr) => {
   qrcode.toDataURL(qr, (err, url) => {
     qrImage = url;
-    console.log("QR Code generated. Open /qr in your browser.");
+    console.log("📱 QR Code generated. Open /qr in your browser to scan.");
   });
 });
 
@@ -43,19 +47,19 @@ client.on("ready", async () => {
 function isPromotionalText(text) {
   if (!text) return false;
   const PROMO_KEYWORDS = [
-  "free offer", "limited time", "discount", "deal", "sale", "offer",
-  "buy now", "special price", "hurry up", "clearance", "lowest price",
-  "guarantee", "best deal", "earn money", "quick cash", "loan", "payday",
-  "0% interest", "investment opportunity", "passive income", "credit card",
-  "money back", "referral bonus", "invite & earn", "share and win",
-  "exclusive access", "get started today", "promo code", "coupon", "voucher",
-  "join now", "limited seats", "act fast", "don’t miss out", "only today",
-  "expires soon", "last chance", "register now", "limited stock", "click here",
-  "link in bio", "whatsapp me", "DM now", "guaranteed results", "no risk",
-  "100% working", "secret trick"
-];
+    "free offer", "limited time", "discount", "deal", "sale", "offer",
+    "buy now", "special price", "hurry up", "clearance", "lowest price",
+    "guarantee", "best deal", "earn money", "quick cash", "loan", "payday",
+    "0% interest", "investment opportunity", "passive income", "credit card",
+    "money back", "referral bonus", "invite & earn", "share and win",
+    "exclusive access", "get started today", "promo code", "coupon", "voucher",
+    "join now", "limited seats", "act fast", "don’t miss out", "only today",
+    "expires soon", "last chance", "register now", "limited stock", "click here",
+    "link in bio", "whatsapp me", "DM now", "guaranteed results", "no risk",
+    "100% working", "secret trick"
+  ];
 
-  return promoKeywords.some((kw) => text.toLowerCase().includes(kw));
+  return PROMO_KEYWORDS.some((kw) => text.toLowerCase().includes(kw));
 }
 
 // ------------------- AI Helpers -------------------
@@ -159,7 +163,6 @@ client.on("message", async (msg) => {
       console.log("🛑 Promotional message detected:", msg.body || "Image");
 
       try {
-        // Forward to specific group
         const targetChat = await client.getChatById(PROMO_FORWARD_GROUP_ID);
         await msg.forward(targetChat.id._serialized);
         console.log("➡️ Forwarded promotional message to:", PROMO_FORWARD_GROUP_ID);
@@ -176,5 +179,7 @@ client.on("message", async (msg) => {
 });
 
 client.initialize();
+
+// ------------------- Express server -------------------
 const PORT = process.env.PORT || 3000;
-app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
+app.listen(PORT, () => console.log(`🌍 Server running on port ${PORT}`));
