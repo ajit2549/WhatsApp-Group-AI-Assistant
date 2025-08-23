@@ -1,7 +1,7 @@
 // bot.js
 import pkg from "whatsapp-web.js";
 const { Client, LocalAuth } = pkg;
-import qrcode from "qrcode-terminal";
+import qrcode from "qrcode";
 import fetch from "node-fetch";
 import Tesseract from "tesseract.js";
 import express from "express";
@@ -35,7 +35,7 @@ const client = new Client({
 client.on("qr", (qr) => {
   qrcode.toDataURL(qr, (err, url) => {
     qrImage = url;
-    console.log("📱 QR Code generated. Visit /qr on Render to scan.");
+    console.log("📱 QR Code generated. Visit /qr on your Render app to scan.");
   });
 });
 
@@ -43,7 +43,7 @@ app.get("/qr", (req, res) => {
   if (qrImage) {
     res.send(`<h2>Scan this QR Code:</h2><img src="${qrImage}" />`);
   } else {
-    res.send("⏳ QR not generated yet. Please wait...");
+    res.send("⏳ QR not generated yet. Please refresh after a few seconds...");
   }
 });
 
@@ -57,7 +57,7 @@ client.on("ready", async () => {
 function isPromotionalText(text) {
   if (!text) return false;
   const PROMO_KEYWORDS = [
-    "free offer", "limited time", "discount", "deal", "sale", "offer",
+    "free offer", "limited time", "discount", "deal", "sale","sell", "offer",
     "buy now", "special price", "hurry up", "clearance", "lowest price",
     "guarantee", "best deal", "earn money", "quick cash", "loan", "payday",
     "0% interest", "investment opportunity", "passive income", "credit card",
