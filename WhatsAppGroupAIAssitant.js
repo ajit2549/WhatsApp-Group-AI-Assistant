@@ -18,26 +18,36 @@ const client = new Client({
   authStrategy: new LocalAuth(),
   puppeteer: {
     headless: true,
-    executablePath: '/usr/bin/chromium',
-    args: ['--no-sandbox', '--disable-setuid-sandbox']
-  }
+    args: [
+      "--no-sandbox",
+      "--disable-setuid-sandbox",
+      "--disable-dev-shm-usage",
+      "--disable-accelerated-2d-canvas",
+      "--no-first-run",
+      "--no-zygote",
+      "--single-process",
+      "--disable-gpu",
+    ],
+  },
 });
 
+// ------------------- QR handling -------------------
 client.on("qr", (qr) => {
   qrcode.toDataURL(qr, (err, url) => {
     qrImage = url;
-    console.log("📱 QR Code generated. Open /qr in your browser to scan.");
+    console.log("📱 QR Code generated. Visit /qr on Render to scan.");
   });
 });
 
 app.get("/qr", (req, res) => {
   if (qrImage) {
-    res.send(`<img src="${qrImage}" />`);
+    res.send(`<h2>Scan this QR Code:</h2><img src="${qrImage}" />`);
   } else {
-    res.send("QR not generated yet. Please wait...");
+    res.send("⏳ QR not generated yet. Please wait...");
   }
 });
 
+// ------------------- WhatsApp Ready -------------------
 client.on("ready", async () => {
   console.log("✅ Bot is ready!");
   console.log("🤖 Bot ID:", client.info.wid._serialized);
@@ -62,7 +72,7 @@ function isPromotionalText(text) {
   return PROMO_KEYWORDS.some((kw) => text.toLowerCase().includes(kw));
 }
 
-// ------------------- AI Helpers -------------------
+// ------------------- AI Reply Helper -------------------
 async function generateAIReply(messageText, history = []) {
   try {
     const response = await fetch("https://openrouter.ai/api/v1/chat/completions", {
@@ -92,7 +102,7 @@ async function generateAIReply(messageText, history = []) {
   }
 }
 
-// ------------------- OCR / Vision -------------------
+// ------------------- OCR Helpers -------------------
 async function extractTextFromImage(base64Image) {
   try {
     const buffer = Buffer.from(base64Image, "base64");
@@ -124,7 +134,7 @@ async function isPromotionalImage(message) {
 }
 
 // ------------------- Conversation Memory -------------------
-const conversations = {}; // { chatId: { last: timestamp, history: [] } }
+const conversations = {};
 const CONTEXT_WINDOW = 2 * 60 * 1000; // 2 minutes
 
 // ------------------- WhatsApp Message Handler -------------------
@@ -137,7 +147,7 @@ client.on("message", async (msg) => {
     const chatId = chat.id._serialized;
     const isTagged = msg.mentionedIds.includes(botId);
 
-    // 1️⃣ Tagged → start or continue conversation
+    // Tagged → conversation
     if (isTagged) {
       if (
         !conversations[chatId] ||
@@ -155,7 +165,7 @@ client.on("message", async (msg) => {
       return msg.reply(aiReply);
     }
 
-    // 2️⃣ Not tagged → detect and delete promo
+    // Not tagged → detect promo
     if (
       isPromotionalText(msg.body) ||
       (msg.hasMedia && (await isPromotionalImage(msg)))
@@ -165,9 +175,9 @@ client.on("message", async (msg) => {
       try {
         const targetChat = await client.getChatById(PROMO_FORWARD_GROUP_ID);
         await msg.forward(targetChat.id._serialized);
-        console.log("➡️ Forwarded promotional message to:", PROMO_FORWARD_GROUP_ID);
+        console.log("➡️ Forwarded promo to:", PROMO_FORWARD_GROUP_ID);
       } catch (err) {
-        console.error("❌ Error forwarding promo message:", err);
+        console.error("❌ Error forwarding promo:", err);
       }
 
       await msg.delete(true);
